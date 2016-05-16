@@ -53,7 +53,7 @@ globalvars["cleanoption"] = options.cleanall
 globalvars["debugoption"] = options.debug
 globalvars["kubeopt"] = options.kube
 globalvars["env"] = []
-globalvars["quotas"] = testconfig["quotas"]
+#globalvars["quotas"] = testconfig["quotas"]
 globalvars["kubeconfig"] = options.kubeconfig
 globalvars["processes"] = options.processes
 

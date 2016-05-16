@@ -1,0 +1,59 @@
+projects:
+  - num: 10
+    basename: cakephp-mysql
+    tuning: default
+    templates:
+      - num: 1
+        file: ./content/quickstarts/cakephp-mysql.json
+
+  - num: 5
+    basename: dancer-mysql
+    tuning: default
+    templates:
+      - num: 1
+        file: ./content/quickstarts/dancer-mysql.json
+
+  - num: 5
+    basename: django-postgresql
+    tuning: default
+    templates:
+      - num: 1
+        file: ./content/quickstarts/django-postgresql.json
+
+  - num: 5
+    basename: nodejs-mongodb
+    tuning: default
+    templates:
+      - num: 1
+        file: ./content/quickstarts/nodejs-mongodb.json
+
+  - num: 4
+    basename: rails-postgresql
+    tuning: default
+    templates:
+      - num: 1
+        file: ./content/quickstarts/rails-postgresql.json
+
+  - num: 4
+    basename: eap64-mysql
+    tuning: default
+    templates:
+      - num: 1
+        file: ./content/quickstarts/eap64-mysql-persistent-s2i.json
+
+  - num: 5
+    basename: tomcat8-mongodb
+    tuning: default
+    templates:
+      - num: 1
+        file: ./content/quickstarts/jws30-tomcat8-mongodb-persistent-s2i.json
+
+tuningsets:
+  - name: default
+    pods:
+      stepping:
+        stepsize: 5
+        pause: 0 min
+      rate_limit:
+        delay: 0 ms
+
