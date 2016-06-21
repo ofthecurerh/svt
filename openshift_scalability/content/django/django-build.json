@@ -2,22 +2,23 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-	"name": "nodejs-example",
+	"name": "django-psql-example",
 	"annotations": {
-	    "description": "An example Node.js application with no database",
-	    "tags": "instant-app,nodejs",
-	    "iconClass": "icon-nodejs"
+	    "description": "An example Django application with a PostgreSQL database",
+	    "source": "https://github.com/openshift/online/blob/master/templates/examples/django-postgresql.json",
+	    "tags": "quickstart,python,django,postgresql",
+	    "iconClass": "icon-python"
 	}
     },
     "labels": {
-	"template": "nodejs-example"
+	"template": "django-psql-example"
     },
     "objects": [
 	{
 	    "kind": "ImageStream",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "nodejs-example",
+		"name": "django-psql-example",
 		"annotations": {
 		    "description": "Keeps track of changes in the application image"
 		}
@@ -27,7 +28,7 @@
 	    "kind": "BuildConfig",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "nodejs-example",
+		"name": "django-psql-example",
 		"annotations": {
 		    "description": "Defines how to build the application"
 		}
@@ -47,14 +48,14 @@
 			"from": {
 			    "kind": "ImageStreamTag",
 			    "namespace": "openshift",
-			    "name": "nodejs:latest"
+			    "name": "python:3.4"
 			}
 		    }
 		},
 		"output": {
 		    "to": {
 			"kind": "ImageStreamTag",
-			"name": "nodejs-example:latest"
+			"name": "django-psql-example:latest"
 		    }
 		},
 		"triggers": [
@@ -69,40 +70,35 @@
 			"github": {
 			    "secret": "${GITHUB_WEBHOOK_SECRET}"
 			}
-		    },
-		    {
-			"type": "Generic",
-			"generic": {
-			    "secret": "${GENERIC_WEBHOOK_SECRET}"
-			}
 		    }
-		]
+		],
+		"postCommit": {
+		    "script": "./manage.py test"
+		}
 	    }
 	}
     ],
     "parameters": [
 	{
 	    "name": "SOURCE_REPOSITORY_URL",
-	    "description": "The URL of the repository with your application source code",
-	    "value": "https://github.com/openshift/nodejs-ex.git"
+	    "displayName": "Git Repository URL",
+	    "description": "The URL of the repository with your application source code.",
+	    "value": "https://github.com/openshift/django-ex.git"
 	},
 	{
 	    "name": "SOURCE_REPOSITORY_REF",
-	    "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch"
+	    "displayName": "Git Reference",
+	    "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
 	},
 	{
 	    "name": "CONTEXT_DIR",
-	    "description": "Set this to the relative path to your project if it is not in the root of your repository"
+	    "displayName": "Context Directory",
+	    "description": "Set this to the relative path to your project if it is not in the root of your repository."
 	},
 	{
 	    "name": "GITHUB_WEBHOOK_SECRET",
-	    "description": "A secret string used to configure the GitHub webhook",
-	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{40}"
-	},
-	{
-	    "name": "GENERIC_WEBHOOK_SECRET",
-	    "description": "A secret string used to configure the Generic webhook",
+	    "displayName": "GitHub Webhook Secret",
+	    "description": "A secret string used to configure the GitHub webhook.",
 	    "generate": "expression",
 	    "from": "[a-zA-Z0-9]{40}"
 	}
