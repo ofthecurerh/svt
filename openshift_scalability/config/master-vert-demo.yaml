@@ -1,19 +1,19 @@
 projects:
-  - num: 2
+  - num: 1
     basename: cakephp-mysql
     tuning: default
     templates:
       - num: 1
         file: ./content/cakephp/cakephp-mysql-pv-deploy.json
 
-  - num: 2
+  - num: 1
     basename: dancer-mysql
     tuning: default
     templates:
       - num: 1
         file: ./content/dancer/dancer-mysql-pv-deploy.json
 
-  - num: 2
+  - num: 1
     basename: django-postgresql
     tuning: default
     templates:

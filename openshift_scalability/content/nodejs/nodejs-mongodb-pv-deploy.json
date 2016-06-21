@@ -2,7 +2,7 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-	"name": "nodejs-mongodb-example"
+	"name": "nodejs-mongodb-example",
 	"annotations": {
 	    "description": "An example Node.js application with a MongoDB database",
 	    "tags": "quickstart,nodejs,mongodb",
@@ -73,7 +73,8 @@
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
-				"name": "nodejs-mongodb-example:latest"
+				"name": "nodejs-mongodb-example:latest",
+				"namespace": "openshift"
 			    }
 			}
 		    },

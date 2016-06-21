@@ -337,7 +337,8 @@
                             ],
                             "from": {
                                 "kind": "ImageStream",
-                                "name": "${APPLICATION_NAME}"
+                                "name": "${APPLICATION_NAME}",
+				"namespace": "openshift"
                             }
                         }
                     },

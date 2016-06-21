@@ -73,7 +73,8 @@
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
-				"name": "django-psql-example:latest"
+				"name": "django-psql-example:latest",
+				"namespace": "openshift"
 			    }
 			}
 		    },

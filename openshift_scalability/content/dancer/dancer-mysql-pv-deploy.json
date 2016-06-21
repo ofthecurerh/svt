@@ -70,7 +70,8 @@
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
-				"name": "dancer-mysql-example:latest"
+				"name": "dancer-mysql-example:latest",
+				"namespace": "openshift"
 			    }
 			}
 		    },

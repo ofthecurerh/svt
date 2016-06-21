@@ -84,7 +84,8 @@
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
-				"name": "rails-postgresql-example:latest"
+				"name": "rails-postgresql-example:latest",
+				"namespace": "openshift"
 			    }
 			}
 		    },
