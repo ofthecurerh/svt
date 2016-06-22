@@ -46,7 +46,7 @@ projects:
     tuning: default
     templates:
       - num: 1
-        file: ./content/tomcat/tomcat8-mongodb-deploy.json
+        file: ./content/tomcat/tomcat8-mongodb-pv-deploy.json
 
 tuningsets:
   - name: default
