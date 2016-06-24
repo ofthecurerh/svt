@@ -5,6 +5,7 @@
 	"name": "rails-postgresql-example",
 	"annotations": {
 	    "description": "An example Rails application with a PostgreSQL database",
+	    "source": "https://github.com/openshift/online/blob/master/templates/examples/rails-postgresql.json",
 	    "tags": "quickstart,ruby,rails,postgresql",
 	    "iconClass": "icon-ruby"
 	}
@@ -271,26 +272,6 @@
 	    }
 	},
 	{
-	    "kind": "PersistentVolumeClaim",
-	    "apiVersion": "v1",
-	    "metadata": {
-		"name": "${DATABASE_SERVICE_NAME}",
-	  	"annotations": {
-		    "volume.alpha.kubernetes.io/storage-class": "foo"
-		}
-	    },
-	    "spec": {
-		"accessModes": [
-		    "ReadWriteOnce"
-		],
-		"resources": {
-		    "requests": {
-			"storage": "${VOLUME_CAPACITY}"
-		    }
-		}
-	    }
-	},
-	{
 	    "kind": "DeploymentConfig",
 	    "apiVersion": "v1",
 	    "metadata": {
@@ -386,7 +367,7 @@
 				},
 				"volumeMounts": [
 				    {
-					"name": "${DATABASE_SERVICE_NAME}-data",
+					"name": "data",
 					"mountPath": "/var/lib/pgsql/data"
 				    }
 				]
@@ -394,10 +375,8 @@
 			],
 			"volumes": [
 			    {
-				"name": "${DATABASE_SERVICE_NAME}-data",
-				"persistentVolumeClaim": {
-				    "claimName": "${DATABASE_SERVICE_NAME}"
-				}
+				"name": "data",
+				"emptyDir": {}
 			    }
 			]
 		    }
@@ -417,13 +396,6 @@
 	    "displayName": "Memory Limit (PostgreSQL)",
 	    "description": "Maximum amount of memory the PostgreSQL container can use.",
 	    "value": "512Mi"
-	},
-	{
-	    "name": "VOLUME_CAPACITY",
-	    "displayName": "Volume Capacity",
-	    "description": "Volume space available for data, e.g. 512Mi, 2Gi",
-	    "value": "1Gi",
-	    "required": true
 	},
 	{
 	    "name": "SOURCE_REPOSITORY_URL",

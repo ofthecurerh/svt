@@ -5,6 +5,7 @@
         "annotations": {
             "description": "Application template for EAP 6 MySQL applications with persistent storage built using S2I.",
             "iconClass": "icon-jboss",
+	    "source": "https://github.com/openshift/online/blob/master/templates/examples/eap64-mysql-persistent-s2i.json",
             "tags": "eap,mysql,javaee,java,database,jboss,xpaas",
             "version": "1.2.0"
         },
@@ -48,27 +49,6 @@
             "required": false
         },
         {
-            "description": "Git source URI for application",
-	    "displayName": "Source Repository URL",
-            "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/jboss-openshift/openshift-quickstarts",
-            "required": true
-        },
-        {
-            "description": "Git branch/tag reference",
-	    "displayName": "Source Repository Reference",
-            "name": "SOURCE_REPOSITORY_REF",
-            "value": "1.2",
-            "required": false
-        },
-        {
-            "description": "Path within Git project to build; empty for root project directory.",
-	    "displayName": "Context Directory",
-            "name": "CONTEXT_DIR",
-            "value": "todolist/todolist-jdbc",
-            "required": false
-        },
-        {
             "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/mysql",
 	    "displayName": "JNDI Name",
             "name": "DB_JNDI",
@@ -79,13 +59,6 @@
 	    "displayName": "Database Name",
             "name": "DB_DATABASE",
             "value": "root",
-            "required": true
-        },
-        {
-            "description": "Size of persistent storage for database volume.",
-	    "displayName": "Volume Capacity",
-            "name": "VOLUME_CAPACITY",
-            "value": "1Gi",
             "required": true
         },
         {
@@ -193,20 +166,6 @@
         {
 	    "displayName": "Database User Password",
             "name": "DB_PASSWORD",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
-        },
-        {
-	    "displayName": "GitHub Webhook Secret",
-            "name": "GITHUB_WEBHOOK_SECRET",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
-        },
-        {
-	    "displayName": "Generic Build Webhook Secret",
-            "name": "GENERIC_WEBHOOK_SECRET",
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
@@ -397,74 +356,6 @@
             }
         },
         {
-            "kind": "ImageStream",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "${APPLICATION_NAME}",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                }
-            }
-        },
-        {
-            "kind": "BuildConfig",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "${APPLICATION_NAME}",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                }
-            },
-            "spec": {
-                "source": {
-                    "type": "Git",
-                    "git": {
-                        "uri": "${SOURCE_REPOSITORY_URL}",
-                        "ref": "${SOURCE_REPOSITORY_REF}"
-                    },
-                    "contextDir": "${CONTEXT_DIR}"
-                },
-                "strategy": {
-                    "type": "Source",
-                    "sourceStrategy": {
-                        "forcePull": true,
-                        "from": {
-                            "kind": "ImageStreamTag",
-                            "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-eap64-openshift:1.2"
-                        }
-                    }
-                },
-                "output": {
-                    "to": {
-                        "kind": "ImageStreamTag",
-                        "name": "${APPLICATION_NAME}:latest"
-                    }
-                },
-                "triggers": [
-                    {
-                        "type": "GitHub",
-                        "github": {
-                            "secret": "${GITHUB_WEBHOOK_SECRET}"
-                        }
-                    },
-                    {
-                        "type": "Generic",
-                        "generic": {
-                            "secret": "${GENERIC_WEBHOOK_SECRET}"
-                        }
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChange": {}
-                    },
-                    {
-                        "type": "ConfigChange"
-                    }
-                ]
-            }
-        },
-        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
@@ -487,7 +378,8 @@
                             ],
                             "from": {
                                 "kind": "ImageStream",
-                                "name": "${APPLICATION_NAME}"
+                                "name": "${APPLICATION_NAME}",
+				"namespace": "openshift"
                             }
                         }
                     },
@@ -751,12 +643,6 @@
                                         "protocol": "TCP"
                                     }
                                 ],
-                                "volumeMounts": [
-                                    {
-                                        "mountPath": "/var/lib/mysql/data",
-                                        "name": "${APPLICATION_NAME}-mysql-pvol"
-                                    }
-                                ],
                                 "env": [
                                     {
                                         "name": "MYSQL_USER",
@@ -797,38 +683,7 @@
 				    }
 				}
                             }
-                        ],
-                        "volumes": [
-                            {
-                                "name": "${APPLICATION_NAME}-mysql-pvol",
-                                "persistentVolumeClaim": {
-                                    "claimName": "${APPLICATION_NAME}-mysql-claim"
-                                }
-                            }
                         ]
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "v1",
-            "kind": "PersistentVolumeClaim",
-            "metadata": {
-                "name": "${APPLICATION_NAME}-mysql-claim",
-		"annotations": {
-		    "volume.alpha.kubernetes.io/storage-class": "foo"
-		},
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                }
-            },
-            "spec": {
-                "accessModes": [
-                    "ReadWriteOnce"
-                ],
-                "resources": {
-                    "requests": {
-                        "storage": "${VOLUME_CAPACITY}"
                     }
                 }
             }

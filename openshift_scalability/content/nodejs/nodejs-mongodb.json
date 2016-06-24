@@ -2,22 +2,23 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-	"name": "cakephp-mysql-example",
+	"name": "nodejs-mongodb-example",
 	"annotations": {
-	    "description": "An example CakePHP application with a MySQL database",
-	    "tags": "quickstart,php,cakephp,mysql",
-	    "iconClass": "icon-php"
+	    "description": "An example Node.js application with a MongoDB database",
+	    "tags": "quickstart,nodejs,mongodb",
+	    "iconClass": "icon-nodejs",
+	    "source": "https://github.com/openshift/online/blob/master/templates/examples/nodejs-mongodb.json"
 	}
     },
     "labels": {
-	"template": "cakephp-mysql-example"
+	"template": "nodejs-mongodb-example"
     },
     "objects": [
 	{
 	    "kind": "Service",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "cakephp-mysql-example",
+		"name": "nodejs-mongodb-example",
 		"annotations": {
 		    "description": "Exposes and load balances the application pods"
 		}
@@ -31,7 +32,7 @@
 		    }
 		],
 		"selector": {
-		    "name": "cakephp-mysql-example"
+		    "name": "nodejs-mongodb-example"
 		}
 	    }
 	},
@@ -39,13 +40,13 @@
 	    "kind": "Route",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "cakephp-mysql-example"
+		"name": "nodejs-mongodb-example"
 	    },
 	    "spec": {
 		"host": "${APPLICATION_DOMAIN}",
 		"to": {
 		    "kind": "Service",
-		    "name": "cakephp-mysql-example"
+		    "name": "nodejs-mongodb-example"
 		}
 	    }
 	},
@@ -53,7 +54,7 @@
 	    "kind": "ImageStream",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "cakephp-mysql-example",
+		"name": "nodejs-mongodb-example",
 		"annotations": {
 		    "description": "Keeps track of changes in the application image"
 		}
@@ -63,7 +64,7 @@
 	    "kind": "BuildConfig",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "cakephp-mysql-example",
+		"name": "nodejs-mongodb-example",
 		"annotations": {
 		    "description": "Defines how to build the application"
 		}
@@ -83,14 +84,14 @@
 			"from": {
 			    "kind": "ImageStreamTag",
 			    "namespace": "openshift",
-			    "name": "php:5.6"
+			    "name": "nodejs:0.10"
 			}
 		    }
 		},
 		"output": {
 		    "to": {
 			"kind": "ImageStreamTag",
-			"name": "cakephp-mysql-example:latest"
+			"name": "nodejs-mongodb-example:latest"
 		    }
 		},
 		"triggers": [
@@ -105,53 +106,28 @@
 			"github": {
 			    "secret": "${GITHUB_WEBHOOK_SECRET}"
 			}
+		    },
+		    {
+			"type": "Generic",
+			"generic": {
+			    "secret": "${GENERIC_WEBHOOK_SECRET}"
+			}
 		    }
 		]
-	    }
-	},
-	{
-	    "kind": "PersistentVolumeClaim",
-	    "apiVersion": "v1",
-	    "metadata": {
-		"name": "${DATABASE_SERVICE_NAME}",
-		"annotations": {
-		    "volume.alpha.kubernetes.io/storage-class": "foo"
-		}
-	    },
-	    "spec": {
-		"accessModes": [
-		    "ReadWriteOnce"
-		],
-		"resources": {
-		    "requests": {
-			"storage": "${VOLUME_CAPACITY}"
-		    }
-		}
 	    }
 	},
 	{
 	    "kind": "DeploymentConfig",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "cakephp-mysql-example",
+		"name": "nodejs-mongodb-example",
 		"annotations": {
 		    "description": "Defines how to deploy the application server"
 		}
 	    },
 	    "spec": {
 		"strategy": {
-		    "type": "Rolling",
-		    "recreateParams": {
-			"pre": {
-			    "failurePolicy": "Retry",
-			    "execNewPod": {
-				"command": [
-				    "./migrate-database.sh"
-				],
-				"containerName": "cakephp-mysql-example"
-			    }
-			}
-		    }
+		    "type": "Rolling"
 		},
 		"triggers": [
 		    {
@@ -159,11 +135,11 @@
 			"imageChangeParams": {
 			    "automatic": true,
 			    "containerNames": [
-				"cakephp-mysql-example"
+				"nodejs-mongodb-example"
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
-				"name": "cakephp-mysql-example:latest"
+				"name": "nodejs-mongodb-example:latest"
 			    }
 			}
 		    },
@@ -173,30 +149,52 @@
 		],
 		"replicas": 1,
 		"selector": {
-		    "name": "cakephp-mysql-example"
+		    "name": "nodejs-mongodb-example"
 		},
 		"template": {
 		    "metadata": {
-			"name": "cakephp-mysql-example",
+			"name": "nodejs-mongodb-example",
 			"labels": {
-			    "name": "cakephp-mysql-example"
+			    "name": "nodejs-mongodb-example"
 			}
 		    },
 		    "spec": {
 			"containers": [
 			    {
-				"name": "cakephp-mysql-example",
-				"image": "cakephp-mysql-example",
+				"name": "nodejs-mongodb-example",
+				"image": "nodejs-mongodb-example",
 				"ports": [
 				    {
 					"containerPort": 8080
+				    }
+				],
+				"env": [
+				    {
+					"name": "DATABASE_SERVICE_NAME",
+					"value": "${DATABASE_SERVICE_NAME}"
+				    },
+				    {
+					"name": "MONGODB_USER",
+					"value": "${DATABASE_USER}"
+				    },
+				    {
+					"name": "MONGODB_PASSWORD",
+					"value": "${DATABASE_PASSWORD}"
+				    },
+				    {
+					"name": "MONGODB_DATABASE",
+					"value": "${DATABASE_NAME}"
+				    },
+				    {
+					"name": "MONGODB_ADMIN_PASSWORD",
+					"value": "${DATABASE_ADMIN_PASSWORD}"
 				    }
 				],
 				"readinessProbe": {
 				    "timeoutSeconds": 3,
 				    "initialDelaySeconds": 3,
 				    "httpGet": {
-					"path": "/health.php",
+					"path": "/pagecount",
 					"port": 8080
 				    }
 				},
@@ -204,48 +202,10 @@
 				    "timeoutSeconds": 3,
 				    "initialDelaySeconds": 30,
 				    "httpGet": {
-					"path": "/",
+					"path": "/pagecount",
 					"port": 8080
 				    }
 				},
-				"env": [
-				    {
-					"name": "DATABASE_SERVICE_NAME",
-					"value": "${DATABASE_SERVICE_NAME}"
-				    },
-				    {
-					"name": "DATABASE_ENGINE",
-					"value": "${DATABASE_ENGINE}"
-				    },
-				    {
-					"name": "DATABASE_NAME",
-					"value": "${DATABASE_NAME}"
-				    },
-				    {
-					"name": "DATABASE_USER",
-					"value": "${DATABASE_USER}"
-				    },
-				    {
-					"name": "DATABASE_PASSWORD",
-					"value": "${DATABASE_PASSWORD}"
-				    },
-				    {
-					"name": "CAKEPHP_SECRET_TOKEN",
-					"value": "${CAKEPHP_SECRET_TOKEN}"
-				    },
-				    {
-					"name": "CAKEPHP_SECURITY_SALT",
-					"value": "${CAKEPHP_SECURITY_SALT}"
-				    },
-				    {
-					"name": "CAKEPHP_SECURITY_CIPHER_SEED",
-					"value": "${CAKEPHP_SECURITY_CIPHER_SEED}"
-				    },
-				    {
-					"name": "OPCACHE_REVALIDATE_FREQ",
-					"value": "${OPCACHE_REVALIDATE_FREQ}"
-				    }
-				],
 				"resources": {
 				    "limits": {
 					"memory": "${MEMORY_LIMIT}"
@@ -269,9 +229,9 @@
 	    "spec": {
 		"ports": [
 		    {
-			"name": "mysql",
-			"port": 3306,
-			"targetPort": 3306
+			"name": "mongodb",
+			"port": 27017,
+			"targetPort": 27017
 		    }
 		],
 		"selector": {
@@ -298,12 +258,12 @@
 			"imageChangeParams": {
 			    "automatic": false,
 			    "containerNames": [
-				"mysql"
+				"mongodb"
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
 				"namespace": "openshift",
-				"name": "mysql:5.6"
+				"name": "mongodb:2.6"
 			    }
 			}
 		    },
@@ -325,50 +285,54 @@
 		    "spec": {
 			"containers": [
 			    {
-				"name": "mysql",
-				"image": "mysql",
+				"name": "mongodb",
+				"image": "mongodb",
 				"ports": [
 				    {
-					"containerPort": 3306
+					"containerPort": 27017
+				    }
+				],
+				"env": [
+				    {
+					"name": "MONGODB_USER",
+					"value": "${DATABASE_USER}"
+				    },
+				    {
+					"name": "MONGODB_PASSWORD",
+					"value": "${DATABASE_PASSWORD}"
+				    },
+				    {
+					"name": "MONGODB_DATABASE",
+					"value": "${DATABASE_NAME}"
+				    },
+				    {
+					"name": "MONGODB_ADMIN_PASSWORD",
+					"value": "${DATABASE_ADMIN_PASSWORD}"
 				    }
 				],
 				"readinessProbe": {
 				    "timeoutSeconds": 1,
-				    "initialDelaySeconds": 5,
+				    "initialDelaySeconds": 3,
 				    "exec": {
-					"command": [ "/bin/sh", "-i", "-c", "MYSQL_PWD='${DATABASE_PASSWORD}' mysql -h 127.0.0.1 -u ${DATABASE_USER} -D ${DATABASE_NAME} -e 'SELECT 1'" ]
+					"command": [ "/bin/sh", "-i", "-c", "mongostat --host 127.0.0.1 -u admin -p ${DATABASE_ADMIN_PASSWORD} -n 1 --noheaders"]
 				    }
 				},
 				"livenessProbe": {
 				    "timeoutSeconds": 1,
 				    "initialDelaySeconds": 30,
 				    "tcpSocket": {
-					"port": 3306
+					"port": 27017
 				    }
 				},
-				"env": [
-				    {
-					"name": "MYSQL_USER",
-					"value": "${DATABASE_USER}"
-				    },
-				    {
-					"name": "MYSQL_PASSWORD",
-					"value": "${DATABASE_PASSWORD}"
-				    },
-				    {
-					"name": "MYSQL_DATABASE",
-					"value": "${DATABASE_NAME}"
-				    }
-				],
 				"resources": {
 				    "limits": {
-					"memory": "${MEMORY_MYSQL_LIMIT}"
+					"memory": "${MEMORY_MONGODB_LIMIT}"
 				    }
 				},
 				"volumeMounts": [
 				    {
 					"name": "${DATABASE_SERVICE_NAME}-data",
-					"mountPath": "/var/lib/mysql/data"
+					"mountPath": "/var/lib/mongodb/data"
 				    }
 				]
 			    }
@@ -376,8 +340,8 @@
 			"volumes": [
 			    {
 				"name": "${DATABASE_SERVICE_NAME}-data",
-				"persistentVolumeClaim": {
-				    "claimName": "${DATABASE_SERVICE_NAME}"
+				"emptyDir": {
+				    "medium": ""
 				}
 			    }
 			]
@@ -390,27 +354,20 @@
 	{
 	    "name": "MEMORY_LIMIT",
 	    "displayName": "Memory Limit",
-	    "description": "Maximum amount of memory the CakePHP container can use.",
+	    "description": "Maximum amount of memory the Node.js container can use.",
 	    "value": "512Mi"
 	},
 	{
-	    "name": "MEMORY_MYSQL_LIMIT",
-	    "displayName": "Memory Limit (MySQL)",
-	    "description": "Maximum amount of memory the MySQL container can use.",
+	    "name": "MEMORY_MONGODB_LIMIT",
+	    "displayName": "Memory Limit (MongoDB)",
+	    "description": "Maximum amount of memory the MongoDB container can use.",
 	    "value": "512Mi"
-	},
-	{
-	    "name": "VOLUME_CAPACITY",
-	    "displayName": "Volume Capacity",
-	    "description": "Volume space available for data, e.g. 512Mi, 2Gi",
-	    "value": "1Gi",
-	    "required": true
 	},
 	{
 	    "name": "SOURCE_REPOSITORY_URL",
 	    "displayName": "Git Repository URL",
 	    "description": "The URL of the repository with your application source code.",
-	    "value": "https://github.com/ofthecurerh/cakephp-ex.git"
+	    "value": "https://github.com/openshift/nodejs-ex.git"
 	},
 	{
 	    "name": "SOURCE_REPOSITORY_REF",
@@ -425,7 +382,7 @@
 	{
 	    "name": "APPLICATION_DOMAIN",
 	    "displayName": "Application Hostname",
-	    "description": "The exposed hostname that will route to the CakePHP service, if left blank a value will be defaulted.",
+	    "description": "The exposed hostname that will route to the Node.js service, if left blank a value will be defaulted.",
 	    "value": ""
 	},
 	{
@@ -436,58 +393,42 @@
 	    "from": "[a-zA-Z0-9]{40}"
 	},
 	{
-	    "name": "DATABASE_SERVICE_NAME",
-	    "displayName": "Database Service Name",
-	    "value": "mysql"
-	},
-	{
-	    "name": "DATABASE_ENGINE",
-	    "displayName": "Database Engine",
-	    "description": "Database engine: postgresql, mysql or sqlite (default).",
-	    "value": "mysql"
-	},
-	{
-	    "name": "DATABASE_NAME",
-	    "displayName": "Database Name",
-	    "value": "default"
-	},
-	{
-	    "name": "DATABASE_USER",
-	    "displayName": "Database User",
-	    "value": "cakephp"
-	},
-	{
-	    "name": "DATABASE_PASSWORD",
-	    "displayName": "Database Password",
-	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{16}"
-	},
-	{
-	    "name": "CAKEPHP_SECRET_TOKEN",
-	    "displayName": "CakePHP secret token",
-	    "description": "Set this to a long random string.",
-	    "generate": "expression",
-	    "from": "[\\w]{50}"
-	},
-	{
-	    "name": "CAKEPHP_SECURITY_SALT",
-	    "displayName": "CakePHP Security Salt",
-	    "description": "Security salt for session hash.",
+	    "name": "GENERIC_WEBHOOK_SECRET",
+	    "displayName": "Generic Webhook Secret",
+	    "description": "A secret string used to configure the Generic webhook.",
 	    "generate": "expression",
 	    "from": "[a-zA-Z0-9]{40}"
 	},
 	{
-	    "name": "CAKEPHP_SECURITY_CIPHER_SEED",
-	    "displayName": "CakePHP Security Cipher Seed",
-	    "description": "Security cipher seed for session hash.",
-	    "generate": "expression",
-	    "from": "[0-9]{30}"
+	    "name": "DATABASE_SERVICE_NAME",
+	    "displayName": "Database Service Name",
+	    "value": "mongodb"
 	},
 	{
-	    "name": "OPCACHE_REVALIDATE_FREQ",
-	    "displayName": "OPcache Revalidation Frequency",
-	    "description": "How often to check script timestamps for updates, in seconds. 0 will result in OPcache checking for updates on every request.",
-	    "value": "2"
+	    "name": "DATABASE_USER",
+	    "displayName": "MongoDB Username",
+	    "description": "Username for MongoDB user that will be used for accessing the database.",
+	    "generate": "expression",
+	    "from": "user[A-Z0-9]{3}"
+	},
+	{
+	    "name": "DATABASE_PASSWORD",
+	    "displayName": "MongoDB Password",
+	    "description": "Password for the MongoDB user.",
+	    "generate": "expression",
+	    "from": "[a-zA-Z0-9]{16}"
+	},
+	{
+	    "name": "DATABASE_NAME",
+	    "displayName": "Database Name",
+	    "value": "sampledb"
+	},
+	{
+	    "name": "DATABASE_ADMIN_PASSWORD",
+	    "displayName": "Database Administrator Password",
+	    "description": "Password for the database admin user.",
+	    "generate": "expression",
+	    "from": "[a-zA-Z0-9]{16}"
 	}
     ]
 }

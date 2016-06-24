@@ -5,6 +5,7 @@
 	"name": "dancer-mysql-example",
 	"annotations": {
 	    "description": "An example Dancer application with a MySQL database",
+	    "source": "https://github.com/openshift/online/blob/master/templates/examples/dancer-mysql.json",
 	    "tags": "quickstart,perl,dancer,mysql",
 	    "iconClass": "icon-perl"
 	}
@@ -50,66 +51,6 @@
 	    }
 	},
 	{
-	    "kind": "ImageStream",
-	    "apiVersion": "v1",
-	    "metadata": {
-		"name": "dancer-mysql-example",
-		"annotations": {
-		    "description": "Keeps track of changes in the application image"
-		}
-	    }
-	},
-	{
-	    "kind": "BuildConfig",
-	    "apiVersion": "v1",
-	    "metadata": {
-		"name": "dancer-mysql-example",
-		"annotations": {
-		    "description": "Defines how to build the application"
-		}
-	    },
-	    "spec": {
-		"source": {
-		    "type": "Git",
-		    "git": {
-			"uri": "${SOURCE_REPOSITORY_URL}",
-			"ref": "${SOURCE_REPOSITORY_REF}"
-		    },
-		    "contextDir": "${CONTEXT_DIR}"
-		},
-		"strategy": {
-		    "type": "Source",
-		    "sourceStrategy": {
-			"from": {
-			    "kind": "ImageStreamTag",
-			    "namespace": "openshift",
-			    "name": "perl:5.20"
-			}
-		    }
-		},
-		"output": {
-		    "to": {
-			"kind": "ImageStreamTag",
-			"name": "dancer-mysql-example:latest"
-		    }
-		},
-		"triggers": [
-		    {
-			"type": "ImageChange"
-		    },
-		    {
-			"type": "ConfigChange"
-		    },
-		    {
-			"type": "GitHub",
-			"github": {
-			    "secret": "${GITHUB_WEBHOOK_SECRET}"
-			}
-		    }
-		]
-	    }
-	},
-	{
 	    "kind": "DeploymentConfig",
 	    "apiVersion": "v1",
 	    "metadata": {
@@ -129,7 +70,8 @@
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
-				"name": "dancer-mysql-example:latest"
+				"name": "dancer-mysql-example:latest",
+				"namespace": "openshift"
 			    }
 			}
 		    },
@@ -207,26 +149,6 @@
 				}
 			    }
 			]
-		    }
-		}
-	    }
-	},
-	{
-	    "kind": "PersistentVolumeClaim",
-	    "apiVersion": "v1",
-	    "metadata": {
-		"name": "${DATABASE_SERVICE_NAME}",
-	  	"annotations": {
-		    "volume.alpha.kubernetes.io/storage-class": "foo"
-		}
-	    },
-	    "spec": {
-		"accessModes": [
-		    "ReadWriteOnce"
-		],
-		"resources": {
-		    "requests": {
-			"storage": "${VOLUME_CAPACITY}"
 		    }
 		}
 	    }
@@ -341,7 +263,7 @@
 				},
 				"volumeMounts": [
 				    {
-					"name": "${DATABASE_SERVICE_NAME}-data",
+					"name": "data",
 					"mountPath": "/var/lib/mysql/data"
 				    }
 				]
@@ -349,10 +271,8 @@
 			],
 			"volumes": [
 			    {
-				"name": "${DATABASE_SERVICE_NAME}-data",
-				"persistentVolumeClaim": {
-				    "claimName": "${DATABASE_SERVICE_NAME}"
-				}
+				"name": "data",
+				"emptyDir": {}
 			    }
 			]
 		    }
@@ -374,40 +294,10 @@
 	    "value": "512Mi"
 	},
 	{
-	    "name": "VOLUME_CAPACITY",
-	    "displayName": "Volume Capacity",
-	    "description": "Volume space available for data, e.g. 512Mi, 2Gi",
-	    "value": "1Gi",
-	    "required": true
-	},
-	{
-	    "name": "SOURCE_REPOSITORY_URL",
-	    "displayName": "Git Repository URL",
-	    "description": "The URL of the repository with your application source code.",
-	    "value": "https://github.com/ofthecurerh/dancer-ex.git"
-	},
-	{
-	    "name": "SOURCE_REPOSITORY_REF",
-	    "displayName": "Git Reference",
-	    "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
-	},
-	{
-	    "name": "CONTEXT_DIR",
-	    "displayName": "Context Directory",
-	    "description": "Set this to the relative path to your project if it is not in the root of your repository."
-	},
-	{
 	    "name": "APPLICATION_DOMAIN",
 	    "displayName": "Application Hostname",
 	    "description": "The exposed hostname that will route to the Dancer service, if left blank a value will be defaulted.",
 	    "value": ""
-	},
-	{
-	    "name": "GITHUB_WEBHOOK_SECRET",
-	    "displayName": "GitHub Webhook Secret",
-	    "description": "A secret string used to configure the GitHub webhook.",
-	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{40}"
 	},
 	{
 	    "name": "ADMIN_USERNAME",

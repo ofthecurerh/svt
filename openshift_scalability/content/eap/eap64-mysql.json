@@ -3,34 +3,35 @@
     "apiVersion": "v1",
     "metadata": {
         "annotations": {
-            "iconClass": "icon-tomcat",
-            "description": "Application template for JWS MongoDB applications with persistent storage built using S2I.",
-            "tags": "tomcat,tomcat8,mongodb,java,database,jboss,xpaas",
+            "description": "Application template for EAP 6 MySQL applications with persistent storage built using S2I.",
+            "iconClass": "icon-jboss",
+	    "source": "https://github.com/openshift/online/blob/master/templates/examples/eap64-mysql-persistent-s2i.json",
+            "tags": "eap,mysql,javaee,java,database,jboss,xpaas",
             "version": "1.2.0"
         },
-        "name": "jws30-tomcat8-mongodb-persistent-s2i"
+        "name": "eap64-mysql-persistent-s2i"
     },
     "labels": {
-        "template": "jws30-tomcat8-mongodb-persistent-s2i",
+        "template": "eap64-mysql-persistent-s2i",
         "xpaas": "1.2.0"
     },
     "parameters": [
 	{
 	    "name": "MEMORY_LIMIT",
-	    "displayName": "Memory limit",
-	    "description": "Maximum amount of memory the Tomcat container can use",
+	    "displayName": "Memory Limit",
+	    "description": "Maximum amount of memory the EAP container can use",
 	    "value": "512Mi"
 	},
 	{
-	    "name": "MEMORY_MONGODB_LIMIT",
-	    "displayName": "MongoDB Memory Limit",
-	    "description": "Maximum amount of memory the MongoDB container can use",
+	    "name": "MEMORY_MYSQL_LIMIT",
+	    "displayName": "MySQL Memory Limit",
+	    "description": "Maximum amount of memory the MySQL container can use",
 	    "value": "512Mi"
 	},
         {
 	    "displayName": "Application Name",
             "name": "APPLICATION_NAME",
-            "value": "jws-app",
+            "value": "eap-app",
             "required": true
         },
         {
@@ -65,53 +66,59 @@
             "description": "Path within Git project to build; empty for root project directory.",
 	    "displayName": "Context Directory",
             "name": "CONTEXT_DIR",
-            "value": "todolist/todolist-mongodb",
+            "value": "todolist/todolist-jdbc",
             "required": false
         },
         {
-            "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/mongodb",
+            "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/mysql",
 	    "displayName": "JNDI Name",
             "name": "DB_JNDI",
-            "value": "",
+            "value": "java:jboss/datasources/TodoListDS",
             "required": false
         },
         {
-            "displayName": "Database Name",
+	    "displayName": "Database Name",
             "name": "DB_DATABASE",
             "value": "root",
             "required": true
         },
         {
-            "description": "Size of persistent storage for database volume.",
-	    "displayName": "Volume Capacity",
-            "name": "VOLUME_CAPACITY",
-            "value": "1Gi",
-            "required": true
+	    "displayName": "Queue Names",
+            "name": "HORNETQ_QUEUES",
+            "value": "",
+            "required": false
         },
         {
-            "description": "The name of the secret containing the certificate files",
+	    "displayName": "Topic Names",
+            "name": "HORNETQ_TOPICS",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The name of the secret containing the keystore file",
 	    "displayName": "HTTPS Secret",
-            "name": "JWS_HTTPS_SECRET",
-            "value": "jws-app-secret",
-            "required": true
-        },
-        {
-            "description": "The name of the certificate file within the secret",
-	    "displayName": "HTTPS Certificate",
-            "name": "JWS_HTTPS_CERTIFICATE",
-            "value": "server.crt",
+            "name": "HTTPS_SECRET",
+            "value": "eap-app-secret",
             "required": false
         },
         {
-            "description": "The name of the certificate key file within the secret",
-	    "displayName": "HTTPS Certificate Key",
-            "name": "JWS_HTTPS_CERTIFICATE_KEY",
-            "value": "server.key",
+            "description": "The name of the keystore file within the secret",
+	    "displayName": "HTTPS Keystore",
+            "name": "HTTPS_KEYSTORE",
+            "value": "keystore.jks",
             "required": false
         },
         {
-            "displayName": "HTTPS Certificate Password",
-            "name": "JWS_HTTPS_CERTIFICATE_PASSWORD",
+            "description": "The name associated with the server certificate",
+	    "displayName": "HTTPS Name",
+            "name": "HTTPS_NAME",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The password for the keystore and certificate",
+	    "displayName": "HTTPS Password",
+            "name": "HTTPS_PASSWORD",
             "value": "",
             "required": false
         },
@@ -122,8 +129,8 @@
             "required": false
         },
         {
-	    "displayName": "Maximum Database Pool Size",
             "description": "Sets xa-pool/max-pool-size for the configured datasource.",
+	    "displayName": "Maximum Database Pool Size",
             "name": "DB_MAX_POOL_SIZE",
             "required": false
         },
@@ -134,66 +141,65 @@
             "required": false
         },
         {
-            "displayName": "Disable Data File Preallocation.",
-            "name": "MONGODB_NOPREALLOC",
+            "description": "Sets how the table names are stored and compared.",
+	    "displayName": "Lower Case Table Names",
+            "name": "MYSQL_LOWER_CASE_TABLE_NAMES",
             "required": false
         },
         {
-            "displayName": "Enable Smaller File Size Default.",
-            "description": "Set MongoDB to use a smaller default data file size.",
-            "name": "MONGODB_SMALLFILES",
+            "description": "The maximum permitted number of simultaneous client connections.",
+	    "displayName": "Maximum Connections",
+            "name": "MYSQL_MAX_CONNECTIONS",
             "required": false
         },
         {
-            "displayName": "Enable Quite Mode.",
-            "description": "Runs MongoDB in a quiet mode that attempts to limit the amount of output.",
-            "name": "MONGODB_QUIET",
+            "description": "The minimum length of the word to be included in a FULLTEXT index.",
+	    "displayName": "Minimum Word Length",
+            "name": "MYSQL_FT_MIN_WORD_LEN",
             "required": false
         },
         {
-            "displayName": "Database Username",
+            "description": "The maximum length of the word to be included in a FULLTEXT index.",
+	    "displayName": "Maximum Word Length",
+            "name": "MYSQL_FT_MAX_WORD_LEN",
+            "required": false
+        },
+        {
+            "description": "Controls the innodb_use_native_aio setting value if the native AIO is broken.",
+	    "displayName": "MySQL AIO",
+            "name": "MYSQL_AIO",
+            "required": false
+        },
+        {
+	    "displayName": "HornetQ Cluster Administrator Password",
+            "name": "HORNETQ_CLUSTER_PASSWORD",
+            "from": "[a-zA-Z0-9]{8}",
+            "generate": "expression",
+            "required": true
+        },
+        {
+	    "displayName": "Database Username",
             "name": "DB_USERNAME",
             "from": "user[a-zA-Z0-9]{3}",
             "generate": "expression",
             "required": true
         },
         {
-            "displayName": "Database User Password",
+	    "displayName": "Database User Password",
             "name": "DB_PASSWORD",
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
         },
         {
-            "displayName": "Database Administrator Password",
-            "name": "DB_ADMIN_PASSWORD",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
-        },
-        {
-            "displayName": "Admininstrator Username",
-            "name": "JWS_ADMIN_USERNAME",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
-        },
-        {
-            "displayName": "Administrator Password",
-            "name": "JWS_ADMIN_PASSWORD",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
-        },
-        {
-            "displayName": "GitHub Webhook Secret",
+	    "displayName": "GitHub Webhook Secret",
             "name": "GITHUB_WEBHOOK_SECRET",
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
         },
         {
-            "displayName": "Generic Build Webhook Secret",
+	    "displayName": "Generic Build Webhook Secret",
             "name": "GENERIC_WEBHOOK_SECRET",
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
@@ -205,6 +211,41 @@
             "name": "IMAGE_STREAM_NAMESPACE",
             "value": "openshift",
             "required": true
+        },
+        {
+            "description": "The name of the secret containing the keystore file",
+	    "displayName": "JGroups Encryption Secret",
+            "name": "JGROUPS_ENCRYPT_SECRET",
+            "value": "eap-app-secret",
+            "required": false
+        },
+        {
+            "description": "The name of the keystore file within the secret",
+	    "displayName": "JGroups Encryption Keystore",
+            "name": "JGROUPS_ENCRYPT_KEYSTORE",
+            "value": "jgroups.jceks",
+            "required": false
+        },
+        {
+            "description": "The name associated with the server certificate",
+	    "displayName": "JGroups Encryption Name",
+            "name": "JGROUPS_ENCRYPT_NAME",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "The password for the keystore and certificate",
+	    "displayName": "JGroups Ecryption Password",
+            "name": "JGROUPS_ENCRYPT_PASSWORD",
+            "value": "",
+            "required": false
+        },
+        {
+	    "displayName": "JGroups Cluster Password",
+            "name": "JGROUPS_CLUSTER_PASSWORD",
+            "from": "[a-zA-Z0-9]{8}",
+            "generate": "expression",
+            "required": true
         }
     ],
     "objects": [
@@ -212,11 +253,11 @@
             "kind": "ServiceAccount",
             "apiVersion": "v1",
             "metadata": {
-                "name": "jws-service-account"
+                "name": "eap-service-account"
             },
             "secrets": [
                 {
-                    "name": "jws-app-secret"
+                    "name": "eap-app-secret"
                 }
             ]
         },
@@ -225,13 +266,13 @@
             "apiVersion": "v1",
             "metadata": {
                 "annotations": {
-                    "description": "Default server certificate 'server.crt' and private key 'server.key' with no certificate password"
+                    "description": "Default HTTPS keystore (keystore.jks) with name 'jboss' and password 'mykeystorepass' and JGoups keystore (jgroups.jceks) with name 'secret-key' and password 'password'"
                 },
-                "name": "jws-app-secret"
+                "name": "eap-app-secret"
             },
             "data": {
-                "server.crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURhakNDQWxLZ0F3SUJBZ0lKQUlTd2g5UGtlUUhNTUEwR0NTcUdTSWIzRFFFQkJRVUFNQ3d4Q3pBSkJnTlYKQkFZVEFrTkJNUXN3Q1FZRFZRUUlFd0pDUXpFUU1BNEdBMVVFQ2hNSFVtVmtJRWhoZERBZUZ3MHhOVEE1TVRZeQpNRFEzTXpSYUZ3MHhPREE1TVRVeU1EUTNNelJhTUN3eEN6QUpCZ05WQkFZVEFrTkJNUXN3Q1FZRFZRUUlFd0pDClF6RVFNQTRHQTFVRUNoTUhVbVZrSUVoaGREQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0MKZ2dFQkFLVWRnNFhkSXhONVBFQlZGOG1GcXZCZk12Z3JaOXEveVJLZnNNdGVIdjdPNjJsdVNFSmhyalFCNnRULwpxODkxL3FnbnYvN2RuamlBek5udU5OeVFmMHIzTTNjV3dkRzhLY0pQUmVzcmF3TUZUaVo3KzRnTUlSa3lsOUZkCno4Z05rYktWOTBjQjZteWpNZ2hkTVY0aGh4K0Y4VHA5dGh2ek5kVmcrNHpPQkNTUkdkYWNHTFoxbzJadjZzVjMKb2tqSzRLNVBuVllFR0R3ODFoeE5NRnVGMXAwN1ViQjlVQitadjI0SmUxTXpFWWxtbmZiTSsybVNoSXNxWlJrUgp3NTErUVJnWDlrNXQzL0I3MzZ2QUdZU3BuUktnc3ZPQUFpdmY4NnQ4MWVFSExFY3NnQjZUWUwyamJoVW1yVGFPCmpDcS9RZ1lIbzdVdnlSVTNrRTg2bWlFdW5ia0NBd0VBQWFPQmpqQ0JpekFkQmdOVkhRNEVGZ1FVL2V4QlppRGYKaU9ISHhscmczZzdPMkYvelU4Y3dYQVlEVlIwakJGVXdVNEFVL2V4QlppRGZpT0hIeGxyZzNnN08yRi96VThlaApNS1F1TUN3eEN6QUpCZ05WQkFZVEFrTkJNUXN3Q1FZRFZRUUlFd0pDUXpFUU1BNEdBMVVFQ2hNSFVtVmtJRWhoCmRJSUpBSVN3aDlQa2VRSE1NQXdHQTFVZEV3UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUZCUUFEZ2dFQkFIbm8KUU1aeXYzTEQzNi9WV1JOOHMyYm5ZVzN2N3Y5YUNJNUNBbyswQklsZExyaTNVWlR3M0NQaVdpbHVwTUxweENQZQpVbGF0RHJ3Nkx2NVdRajlyN3EzR0tHQW1ZS3hva2VKMmZuL2wweVF2R1grVkRKZW9kTWgyZXl3YW1yLytjdjllCnhWOGtpeWozVFNSNC9hUWgwUUxlUytaMjhoanp3bFBiVkxpTW90L083R3dmM042WDhtWGs5ODczK3psT1FPZncKN0NQeEl4SStYNnNmMlkvOXlkV05jdWdnYStkK3JOam5Rd1ViZ1hWUytxWjZGc1FjQk8wMm5WbDBSMmFDS3pMUQpWd0tXZUJLRlN6Q2lKKy9lUmlaREQ2VHh3K3B1WERVR1hjNWR0TE5leEhrR1dmdUx5T1hmNzNvbEgzTVRsZW8wClcxZzJVeEVJdXRuWU5qQWpwT1E9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K",
-                "server.key": "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBcFIyRGhkMGpFM2s4UUZVWHlZV3E4Rjh5K0N0bjJyL0pFcCt3eTE0ZS9zN3JhVzVJClFtR3VOQUhxMVArcnozWCtxQ2UvL3QyZU9JRE0yZTQwM0pCL1N2Y3pkeGJCMGJ3cHdrOUY2eXRyQXdWT0pudjcKaUF3aEdUS1gwVjNQeUEyUnNwWDNSd0hxYktNeUNGMHhYaUdISDRYeE9uMjJHL00xMVdEN2pNNEVKSkVaMXB3WQp0bldqWm0vcXhYZWlTTXJncmsrZFZnUVlQRHpXSEUwd1c0WFduVHRSc0gxUUg1bS9iZ2w3VXpNUmlXYWQ5c3o3CmFaS0VpeXBsR1JIRG5YNUJHQmYyVG0zZjhIdmZxOEFaaEttZEVxQ3k4NEFDSzkvenEzelY0UWNzUnl5QUhwTmcKdmFOdUZTYXRObzZNS3I5Q0JnZWp0Uy9KRlRlUVR6cWFJUzZkdVFJREFRQUJBb0lCQUJ4ZnJBQk85ZjRjc1V2awowNGVmM3JZYnhlaDduUWNzT2VObmFid28ybTZ6SkNVai9HcmIybEc1bXA4cnFGeW9URENkVkJMNkJueHpOY0NsCmZKUUNpTDFiS1k3bmJEc2NlSmlaZ3N4YzA3RGJNb2pPZVhUeGtLYUIyVER6VEFkMnZYalE2SU5kUXVtVVNiN0MKTlArV0IyQlZaaFRGRVl4UUNRbzM5a0pHRE5RempFL0NQSXl3UVVIYXJkYmMra1F4cVRlSGt3endXWjZGV0UweApDb1hiWHR5U2pxYThTQzRxVFZOZHNTNWt4RzR3VjdudUlkWVBOeGd2eEZkR0NJR2Nid09kakd6eDB6cjNmWC83ClQxaEdUL0FOQnpqWlZnSWFUMHNSYUFsdWl1WGdRNjNvMzJWWXYrMG5qU0JaVVNleW9EZWttUEdLZko0S0hSUGsKNmNTUDRoa0NnWUVBMnFFejVoSnJPaW1sOWkrWDFjMTdyVzlvZFU4aHUvaVhxMnJkK2N1eW8rdUpZR20yZ0RNRwpNR2JDMlpyMTREd2FjLzU0V0VZeFBOTy9UK0laUWNiTUxoNU8vTnowcTJRUWdxOUw4TkY0MkRzcE5oQ0s5THYvCmRLcEVNR2RzRUY4cEtZSEJhNXJ2T24yVDNWcGtFN0QwVE1YQ2lXMEZBUi9BZUhVaUtIcTZheThDZ1lFQXdWYWcKczJwVWo5VXVXQVhJM0NQQUFaNXlpQlBtY0htdHBrczBOWXFOd3FGTDJlRVoyZ0cwbnlFMlFMTlVpcWpqR2cxSwp4dlZaRWhXTlFqNlpsaFBkN213em9QWTM5bUlUeXFkcmxQUzF2Z09XeUZ0M1NJMGFLQXlHaTFDaGd3R0pYMHEvCllROFBqVzJyT0JBSFZ0c1dlUzF1RFJnM2pXKytOMzVseUpZdnE1Y0NnWUVBa0lTSW91ZS8rNFYyVUFMcjBnZHYKWHBqTEt1Z3crMmo3RVBPbVlhMjFtMGRoMnRwbUtkNFFsRVFKUHdDQTBVWEprcTArYmRPUVRvNEY0MDhvdE9NdApLcnNjS1dnQlQ1M29rQXBDSDZESHlkOXBnWFJ6OWd5amMwSHRxelZpS0h4TzRFSUdVaFByV1BXVG5YbFh0L0I3CnZKZm8zU0MwY3liQytwMHJCQ2tFT3o4Q2dZQUdzOW9lWGpGUVN6T3dHWU05SG9BcGpqU3FRd1phSDkzRlJoWXAKUlFSbEd2Sm1PMGVLSjBUN3Ywc0NNelZiR1QvR1IyK3dOaEZBYno3V2JSVWwvc3BTMmExd2h4aXBrZnpkcWJBeApHY3F6SzZ5dWhYMDlKcWNoZkUydHhyM1NyTnIyVXNFUHZGWHRzVCtlVWUvdk11azBpajZtZFpCM2RzaEJaRUJqCkU5SFRRUUtCZ0VSUFVoNFFvZnI1Wk9JWjMwMXhjazFVTjRuSzFNOGl5cU9vSHREZzg1OFNoTEUvZ2pZL0xvWHgKNi9vUmhTdjFtT2ZRUUYzS1ZZek5FbE5YLzhzbUF6M2s1U3I2RDNhM1BSQk9MUzc0aTgyd083aWFiU1JHbk41YQpSaktYMXhJaGkzTjhMK0ttOUgwUDhIK01SdnIxMkplV09GNU9sdGtuSSthN1VRUkxvK3RRCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg=="
+                "keystore.jks": "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",
+                "jgroups.jceks": "zs7OzgAAAAIAAAABAAAAAwAKc2VjcmV0LWtleQAAAVDQhuHmrO0ABXNyADNjb20uc3VuLmNyeXB0by5wcm92aWRlci5TZWFsZWRPYmplY3RGb3JLZXlQcm90ZWN0b3LNV8pZ5zC7UwIAAHhyABlqYXZheC5jcnlwdG8uU2VhbGVkT2JqZWN0PjY9psO3VHACAARbAA1lbmNvZGVkUGFyYW1zdAACW0JbABBlbmNyeXB0ZWRDb250ZW50cQB+AAJMAAlwYXJhbXNBbGd0ABJMamF2YS9sYW5nL1N0cmluZztMAAdzZWFsQWxncQB+AAN4cHVyAAJbQqzzF/gGCFTgAgAAeHAAAAAPMA0ECHcwLGK6EDyLAgEUdXEAfgAFAAAAmCu9wRKf1aYYUOEWe406ncPtIdm3147G7MJyWUu2kJVY15a2QxeZi9w5J3AF6T64CvylUuQjpcC4DWXwVn9BefntkBR8CzTiH7VxEqVOQ/OkFS29Inoq8t7/NBaTgTdmMkb4ETV1gIsy/+W6kk7QTqxItCkdKKGFE90Be/7yL3tG16TCy/ABKl7CO6PHa44CqK2PUE1oaJ+WdAAWUEJFV2l0aE1ENUFuZFRyaXBsZURFU3QAFlBCRVdpdGhNRDVBbmRUcmlwbGVERVMN658veJP01V2j9y8bQCYIzViutw=="
             }
         },
         {
@@ -288,16 +329,16 @@
             "spec": {
                 "ports": [
                     {
-                        "port": 27017,
-                        "targetPort": 27017
+                        "port": 3306,
+                        "targetPort": 3306
                     }
                 ],
                 "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-mongodb"
+                    "deploymentConfig": "${APPLICATION_NAME}-mysql"
                 }
             },
             "metadata": {
-                "name": "${APPLICATION_NAME}-mongodb",
+                "name": "${APPLICATION_NAME}-mysql",
                 "labels": {
                     "application": "${APPLICATION_NAME}"
                 },
@@ -384,7 +425,7 @@
                         "from": {
                             "kind": "ImageStreamTag",
                             "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-webserver30-tomcat8-openshift:1.2"
+                            "name": "jboss-eap64-openshift:1.2"
                         }
                     }
                 },
@@ -461,29 +502,43 @@
                         }
                     },
                     "spec": {
-                        "serviceAccount": "jws-service-account",
+                        "serviceAccount": "eap-service-account",
                         "terminationGracePeriodSeconds": 60,
                         "containers": [
                             {
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
+                                "volumeMounts": [
+                                    {
+                                        "name": "eap-keystore-volume",
+                                        "mountPath": "/etc/eap-secret-volume",
+                                        "readOnly": true
+                                    },
+                                    {
+                                        "name": "eap-jgroups-keystore-volume",
+                                        "mountPath": "/etc/jgroups-encrypt-secret-volume",
+                                        "readOnly": true
+                                    }
+                                ],
+                                "livenessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/bash",
+                                            "-c",
+                                            "/opt/eap/bin/livenessProbe.sh"
+                                        ]
+                                    }
+                                },
                                 "readinessProbe": {
                                     "exec": {
                                         "command": [
                                             "/bin/bash",
                                             "-c",
-                                            "curl -s -u ${JWS_ADMIN_USERNAME}:${JWS_ADMIN_PASSWORD} 'http://localhost:8080/manager/jmxproxy/?get=Catalina%3Atype%3DServer&att=stateName' |grep -iq 'stateName *= *STARTED'"
+                                            "/opt/eap/bin/readinessProbe.sh"
                                         ]
                                     }
                                 },
-                                "volumeMounts": [
-                                    {
-                                        "name": "jws-certificate-volume",
-                                        "mountPath": "/etc/jws-secret-volume",
-                                        "readOnly": true
-                                    }
-                                ],
                                 "ports": [
                                     {
                                         "name": "jolokia",
@@ -499,12 +554,17 @@
                                         "name": "https",
                                         "containerPort": 8443,
                                         "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "ping",
+                                        "containerPort": 8888,
+                                        "protocol": "TCP"
                                     }
                                 ],
                                 "env": [
                                     {
                                         "name": "DB_SERVICE_PREFIX_MAPPING",
-                                        "value": "${APPLICATION_NAME}-mongodb=DB"
+                                        "value": "${APPLICATION_NAME}-mysql=DB"
                                     },
                                     {
                                         "name": "DB_JNDI",
@@ -523,8 +583,8 @@
                                         "value": "${DB_DATABASE}"
                                     },
                                     {
-                                        "name": "DB_ADMIN_PASSWORD",
-                                        "value": "${DB_ADMIN_PASSWORD}"
+                                        "name": "TX_DATABASE_PREFIX_MAPPING",
+                                        "value": "${APPLICATION_NAME}-mysql=DB"
                                     },
                                     {
                                         "name": "DB_MIN_POOL_SIZE",
@@ -539,28 +599,68 @@
                                         "value": "${DB_TX_ISOLATION}"
                                     },
                                     {
-                                        "name": "JWS_HTTPS_CERTIFICATE_DIR",
-                                        "value": "/etc/jws-secret-volume"
+                                        "name": "OPENSHIFT_KUBE_PING_LABELS",
+                                        "value": "application=${APPLICATION_NAME}"
                                     },
                                     {
-                                        "name": "JWS_HTTPS_CERTIFICATE",
-                                        "value": "${JWS_HTTPS_CERTIFICATE}"
+                                        "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
                                     },
                                     {
-                                        "name": "JWS_HTTPS_CERTIFICATE_KEY",
-                                        "value": "${JWS_HTTPS_CERTIFICATE_KEY}"
+                                        "name": "HTTPS_KEYSTORE_DIR",
+                                        "value": "/etc/eap-secret-volume"
                                     },
                                     {
-                                        "name": "JWS_HTTPS_CERTIFICATE_PASSWORD",
-                                        "value": "${JWS_HTTPS_CERTIFICATE_PASSWORD}"
+                                        "name": "HTTPS_KEYSTORE",
+                                        "value": "${HTTPS_KEYSTORE}"
                                     },
                                     {
-                                        "name": "JWS_ADMIN_USERNAME",
-                                        "value": "${JWS_ADMIN_USERNAME}"
+                                        "name": "HTTPS_NAME",
+                                        "value": "${HTTPS_NAME}"
                                     },
                                     {
-                                        "name": "JWS_ADMIN_PASSWORD",
-                                        "value": "${JWS_ADMIN_PASSWORD}"
+                                        "name": "HTTPS_PASSWORD",
+                                        "value": "${HTTPS_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_CLUSTER_PASSWORD",
+                                        "value": "${HORNETQ_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_QUEUES",
+                                        "value": "${HORNETQ_QUEUES}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_TOPICS",
+                                        "value": "${HORNETQ_TOPICS}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_SECRET",
+                                        "value": "${JGROUPS_ENCRYPT_SECRET}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_KEYSTORE_DIR",
+                                        "value": "/etc/jgroups-encrypt-secret-volume"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_KEYSTORE",
+                                        "value": "${JGROUPS_ENCRYPT_KEYSTORE}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_NAME",
+                                        "value": "${JGROUPS_ENCRYPT_NAME}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_ENCRYPT_PASSWORD",
+                                        "value": "${JGROUPS_ENCRYPT_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "JGROUPS_CLUSTER_PASSWORD",
+                                        "value": "${JGROUPS_CLUSTER_PASSWORD}"
                                     }
                                 ],
 				"resources": {
@@ -572,9 +672,15 @@
                         ],
                         "volumes": [
                             {
-                                "name": "jws-certificate-volume",
+                                "name": "eap-keystore-volume",
                                 "secret": {
-                                    "secretName": "${JWS_HTTPS_SECRET}"
+                                    "secretName": "${HTTPS_SECRET}"
+                                }
+                            },
+                            {
+                                "name": "eap-jgroups-keystore-volume",
+                                "secret": {
+                                    "secretName": "${JGROUPS_ENCRYPT_SECRET}"
                                 }
                             }
                         ]
@@ -586,7 +692,7 @@
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}-mongodb",
+                "name": "${APPLICATION_NAME}-mysql",
                 "labels": {
                     "application": "${APPLICATION_NAME}"
                 }
@@ -601,12 +707,12 @@
                         "imageChangeParams": {
                             "automatic": true,
                             "containerNames": [
-                                "${APPLICATION_NAME}-mongodb"
+                                "${APPLICATION_NAME}-mysql"
                             ],
                             "from": {
                                 "kind": "ImageStreamTag",
                                 "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                                "name": "mongodb:latest"
+                                "name": "mysql:latest"
                             }
                         }
                     },
@@ -616,13 +722,13 @@
                 ],
                 "replicas": 1,
                 "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-mongodb"
+                    "deploymentConfig": "${APPLICATION_NAME}-mysql"
                 },
                 "template": {
                     "metadata": {
-                        "name": "${APPLICATION_NAME}-mongodb",
+                        "name": "${APPLICATION_NAME}-mysql",
                         "labels": {
-                            "deploymentConfig": "${APPLICATION_NAME}-mongodb",
+                            "deploymentConfig": "${APPLICATION_NAME}-mysql",
                             "application": "${APPLICATION_NAME}"
                         }
                     },
@@ -630,89 +736,56 @@
                         "terminationGracePeriodSeconds": 60,
                         "containers": [
                             {
-                                "name": "${APPLICATION_NAME}-mongodb",
-                                "image": "mongodb",
+                                "name": "${APPLICATION_NAME}-mysql",
+                                "image": "mysql",
                                 "imagePullPolicy": "Always",
                                 "ports": [
                                     {
-                                        "containerPort": 27017,
+                                        "containerPort": 3306,
                                         "protocol": "TCP"
-                                    }
-                                ],
-                                "volumeMounts": [
-                                    {
-                                        "mountPath": "/var/lib/mongodb/data",
-                                        "name": "${APPLICATION_NAME}-mongodb-pvol"
                                     }
                                 ],
                                 "env": [
                                     {
-                                        "name": "MONGODB_USER",
+                                        "name": "MYSQL_USER",
                                         "value": "${DB_USERNAME}"
                                     },
                                     {
-                                        "name": "MONGODB_PASSWORD",
+                                        "name": "MYSQL_PASSWORD",
                                         "value": "${DB_PASSWORD}"
                                     },
                                     {
-                                        "name": "MONGODB_DATABASE",
+                                        "name": "MYSQL_DATABASE",
                                         "value": "${DB_DATABASE}"
                                     },
                                     {
-                                        "name": "MONGODB_ADMIN_PASSWORD",
-                                        "value": "${DB_ADMIN_PASSWORD}"
+                                        "name": "MYSQL_LOWER_CASE_TABLE_NAMES",
+                                        "value": "${MYSQL_LOWER_CASE_TABLE_NAMES}"
                                     },
                                     {
-                                        "name": "MONGODB_NOPREALLOC",
-                                        "value": "${MONGODB_NOPREALLOC}"
+                                        "name": "MYSQL_MAX_CONNECTIONS",
+                                        "value": "${MYSQL_MAX_CONNECTIONS}"
                                     },
                                     {
-                                        "name": "MONGODB_SMALLFILES",
-                                        "value": "${MONGODB_SMALLFILES}"
+                                        "name": "MYSQL_FT_MIN_WORD_LEN",
+                                        "value": "${MYSQL_FT_MIN_WORD_LEN}"
                                     },
                                     {
-                                        "name": "MONGODB_QUIET",
-                                        "value": "${MONGODB_QUIET}"
+                                        "name": "MYSQL_FT_MAX_WORD_LEN",
+                                        "value": "${MYSQL_FT_MAX_WORD_LEN}"
+                                    },
+                                    {
+                                        "name": "MYSQL_AIO",
+                                        "value": "${MYSQL_AIO}"
                                     }
                                 ],
 				"resources": {
 				    "limits": {
-					"memory": "${MEMORY_MONGODB_LIMIT}"
+					"memory": "${MEMORY_MYSQL_LIMIT}"
 				    }
 				}
                             }
-                        ],
-                        "volumes": [
-                            {
-                                "name": "${APPLICATION_NAME}-mongodb-pvol",
-                                "persistentVolumeClaim": {
-                                    "claimName": "${APPLICATION_NAME}-mongodb-claim"
-                                }
-                            }
                         ]
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "v1",
-            "kind": "PersistentVolumeClaim",
-            "metadata": {
-                "name": "${APPLICATION_NAME}-mongodb-claim",
-		"annotations": {
-		    "volume.alpha.kubernetes.io/storage-class": "foo"
-		},
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                }
-            },
-            "spec": {
-                "accessModes": [
-                    "ReadWriteOnce"
-                ],
-                "resources": {
-                    "requests": {
-                        "storage": "${VOLUME_CAPACITY}"
                     }
                 }
             }

@@ -2,22 +2,23 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-	"name": "nodejs-mongodb-example",
+	"name": "dancer-mysql-example",
 	"annotations": {
-	    "description": "An example Node.js application with a MongoDB database",
-	    "tags": "quickstart,nodejs,mongodb",
-	    "iconClass": "icon-nodejs"
+	    "description": "An example Dancer application with a MySQL database",
+	    "source": "https://github.com/openshift/online/blob/master/templates/examples/dancer-mysql.json",
+	    "tags": "quickstart,perl,dancer,mysql",
+	    "iconClass": "icon-perl"
 	}
     },
     "labels": {
-	"template": "nodejs-mongodb-example"
+	"template": "dancer-mysql-example"
     },
     "objects": [
 	{
 	    "kind": "Service",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "nodejs-mongodb-example",
+		"name": "dancer-mysql-example",
 		"annotations": {
 		    "description": "Exposes and load balances the application pods"
 		}
@@ -31,7 +32,7 @@
 		    }
 		],
 		"selector": {
-		    "name": "nodejs-mongodb-example"
+		    "name": "dancer-mysql-example"
 		}
 	    }
 	},
@@ -39,13 +40,13 @@
 	    "kind": "Route",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "nodejs-mongodb-example"
+		"name": "dancer-mysql-example"
 	    },
 	    "spec": {
 		"host": "${APPLICATION_DOMAIN}",
 		"to": {
 		    "kind": "Service",
-		    "name": "nodejs-mongodb-example"
+		    "name": "dancer-mysql-example"
 		}
 	    }
 	},
@@ -53,7 +54,7 @@
 	    "kind": "ImageStream",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "nodejs-mongodb-example",
+		"name": "dancer-mysql-example",
 		"annotations": {
 		    "description": "Keeps track of changes in the application image"
 		}
@@ -63,7 +64,7 @@
 	    "kind": "BuildConfig",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "nodejs-mongodb-example",
+		"name": "dancer-mysql-example",
 		"annotations": {
 		    "description": "Defines how to build the application"
 		}
@@ -83,14 +84,14 @@
 			"from": {
 			    "kind": "ImageStreamTag",
 			    "namespace": "openshift",
-			    "name": "nodejs:0.10"
+			    "name": "perl:5.20"
 			}
 		    }
 		},
 		"output": {
 		    "to": {
 			"kind": "ImageStreamTag",
-			"name": "nodejs-mongodb-example:latest"
+			"name": "dancer-mysql-example:latest"
 		    }
 		},
 		"triggers": [
@@ -105,12 +106,6 @@
 			"github": {
 			    "secret": "${GITHUB_WEBHOOK_SECRET}"
 			}
-		    },
-		    {
-			"type": "Generic",
-			"generic": {
-			    "secret": "${GENERIC_WEBHOOK_SECRET}"
-			}
 		    }
 		]
 	    }
@@ -119,26 +114,23 @@
 	    "kind": "DeploymentConfig",
 	    "apiVersion": "v1",
 	    "metadata": {
-		"name": "nodejs-mongodb-example",
+		"name": "dancer-mysql-example",
 		"annotations": {
 		    "description": "Defines how to deploy the application server"
 		}
 	    },
 	    "spec": {
-		"strategy": {
-		    "type": "Rolling"
-		},
 		"triggers": [
 		    {
 			"type": "ImageChange",
 			"imageChangeParams": {
 			    "automatic": true,
 			    "containerNames": [
-				"nodejs-mongodb-example"
+				"dancer-mysql-example"
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
-				"name": "nodejs-mongodb-example:latest"
+				"name": "dancer-mysql-example:latest"
 			    }
 			}
 		    },
@@ -148,52 +140,30 @@
 		],
 		"replicas": 1,
 		"selector": {
-		    "name": "nodejs-mongodb-example"
+		    "name": "dancer-mysql-example"
 		},
 		"template": {
 		    "metadata": {
-			"name": "nodejs-mongodb-example",
+			"name": "dancer-mysql-example",
 			"labels": {
-			    "name": "nodejs-mongodb-example"
+			    "name": "dancer-mysql-example"
 			}
 		    },
 		    "spec": {
 			"containers": [
 			    {
-				"name": "nodejs-mongodb-example",
-				"image": "nodejs-mongodb-example",
+				"name": "dancer-mysql-example",
+				"image": "dancer-mysql-example",
 				"ports": [
 				    {
 					"containerPort": 8080
-				    }
-				],
-				"env": [
-				    {
-					"name": "DATABASE_SERVICE_NAME",
-					"value": "${DATABASE_SERVICE_NAME}"
-				    },
-				    {
-					"name": "MONGODB_USER",
-					"value": "${DATABASE_USER}"
-				    },
-				    {
-					"name": "MONGODB_PASSWORD",
-					"value": "${DATABASE_PASSWORD}"
-				    },
-				    {
-					"name": "MONGODB_DATABASE",
-					"value": "${DATABASE_NAME}"
-				    },
-				    {
-					"name": "MONGODB_ADMIN_PASSWORD",
-					"value": "${DATABASE_ADMIN_PASSWORD}"
 				    }
 				],
 				"readinessProbe": {
 				    "timeoutSeconds": 3,
 				    "initialDelaySeconds": 3,
 				    "httpGet": {
-					"path": "/pagecount",
+					"path": "/health",
 					"port": 8080
 				    }
 				},
@@ -201,10 +171,36 @@
 				    "timeoutSeconds": 3,
 				    "initialDelaySeconds": 30,
 				    "httpGet": {
-					"path": "/pagecount",
+					"path": "/",
 					"port": 8080
 				    }
 				},
+				"env": [
+				    {
+					"name": "DATABASE_SERVICE_NAME",
+					"value": "${DATABASE_SERVICE_NAME}"
+				    },
+				    {
+					"name": "MYSQL_USER",
+					"value": "${DATABASE_USER}"
+				    },
+				    {
+					"name": "MYSQL_PASSWORD",
+					"value": "${DATABASE_PASSWORD}"
+				    },
+				    {
+					"name": "MYSQL_DATABASE",
+					"value": "${DATABASE_NAME}"
+				    },
+				    {
+					"name": "SECRET_KEY_BASE",
+					"value": "${SECRET_KEY_BASE}"
+				    },
+				    {
+					"name": "PERL_APACHE2_RELOAD",
+					"value": "${PERL_APACHE2_RELOAD}"
+				    }
+				],
 				"resources": {
 				    "limits": {
 					"memory": "${MEMORY_LIMIT}"
@@ -212,26 +208,6 @@
 				}
 			    }
 			]
-		    }
-		}
-	    }
-	},
-	{
-	    "kind": "PersistentVolumeClaim",
-	    "apiVersion": "v1",
-	    "metadata": {
-		"name": "${DATABASE_SERVICE_NAME}",
-	  	"annotations": {
-		    "volume.alpha.kubernetes.io/storage-class": "foo"
-		}
-	    },
-	    "spec": {
-		"accessModes": [
-		    "ReadWriteOnce"
-		],
-		"resources": {
-		    "requests": {
-			"storage": "${VOLUME_CAPACITY}"
 		    }
 		}
 	    }
@@ -248,9 +224,9 @@
 	    "spec": {
 		"ports": [
 		    {
-			"name": "mongodb",
-			"port": 27017,
-			"targetPort": 27017
+			"name": "mysql",
+			"port": 3306,
+			"targetPort": 3306
 		    }
 		],
 		"selector": {
@@ -277,12 +253,12 @@
 			"imageChangeParams": {
 			    "automatic": false,
 			    "containerNames": [
-				"mongodb"
+				"mysql"
 			    ],
 			    "from": {
 				"kind": "ImageStreamTag",
 				"namespace": "openshift",
-				"name": "mongodb:2.6"
+				"name": "mysql:5.6"
 			    }
 			}
 		    },
@@ -304,64 +280,58 @@
 		    "spec": {
 			"containers": [
 			    {
-				"name": "mongodb",
-				"image": "mongodb",
+				"name": "mysql",
+				"image": "mysql",
 				"ports": [
 				    {
-					"containerPort": 27017
-				    }
-				],
-				"env": [
-				    {
-					"name": "MONGODB_USER",
-					"value": "${DATABASE_USER}"
-				    },
-				    {
-					"name": "MONGODB_PASSWORD",
-					"value": "${DATABASE_PASSWORD}"
-				    },
-				    {
-					"name": "MONGODB_DATABASE",
-					"value": "${DATABASE_NAME}"
-				    },
-				    {
-					"name": "MONGODB_ADMIN_PASSWORD",
-					"value": "${DATABASE_ADMIN_PASSWORD}"
+					"containerPort": 3306
 				    }
 				],
 				"readinessProbe": {
 				    "timeoutSeconds": 1,
-				    "initialDelaySeconds": 3,
+				    "initialDelaySeconds": 5,
 				    "exec": {
-					"command": [ "/bin/sh", "-i", "-c", "mongostat --host 127.0.0.1 -u admin -p ${DATABASE_ADMIN_PASSWORD} -n 1 --noheaders"]
+					"command": [ "/bin/sh", "-i", "-c", "MYSQL_PWD='${DATABASE_PASSWORD}' mysql -h 127.0.0.1 -u ${DATABASE_USER} -D ${DATABASE_NAME} -e 'SELECT 1'" ]
 				    }
 				},
 				"livenessProbe": {
 				    "timeoutSeconds": 1,
 				    "initialDelaySeconds": 30,
 				    "tcpSocket": {
-					"port": 27017
+					"port": 3306
 				    }
 				},
+				"env": [
+				    {
+					"name": "MYSQL_USER",
+					"value": "${DATABASE_USER}"
+				    },
+				    {
+					"name": "MYSQL_PASSWORD",
+					"value": "${DATABASE_PASSWORD}"
+				    },
+				    {
+					"name": "MYSQL_DATABASE",
+					"value": "${DATABASE_NAME}"
+				    }
+				],
 				"resources": {
 				    "limits": {
-					"memory": "${MEMORY_MONGODB_LIMIT}"
+					"memory": "${MEMORY_MYSQL_LIMIT}"
 				    }
 				},
 				"volumeMounts": [
 				    {
-					"name": "${DATABASE_SERVICE_NAME}-data",
-					"mountPath": "/var/lib/mongodb/data"
+					"name": "data",
+					"mountPath": "/var/lib/mysql/data"
 				    }
 				]
 			    }
 			],
 			"volumes": [
 			    {
-				"name": "${DATABASE_SERVICE_NAME}-data",
-				"persistentVolumeClaim": {
-				    "claimName": "${DATABASE_SERVICE_NAME}"
-				}
+				"name": "data",
+				"emptyDir": {}
 			    }
 			]
 		    }
@@ -373,27 +343,20 @@
 	{
 	    "name": "MEMORY_LIMIT",
 	    "displayName": "Memory Limit",
-	    "description": "Maximum amount of memory the Node.js container can use.",
+	    "description": "Maximum amount of memory the Perl Dancer container can use.",
 	    "value": "512Mi"
 	},
 	{
-	    "name": "MEMORY_MONGODB_LIMIT",
-	    "displayName": "Memory Limit (MongoDB)",
-	    "description": "Maximum amount of memory the MongoDB container can use.",
+	    "name": "MEMORY_MYSQL_LIMIT",
+	    "displayName": "Memory Limit (MySQL)",
+	    "description": "Maximum amount of memory the MySQL container can use.",
 	    "value": "512Mi"
-	},
-	{
-	    "name": "VOLUME_CAPACITY",
-	    "displayName": "Volume Capacity",
-	    "description": "Volume space available for data, e.g. 512Mi, 2Gi",
-	    "value": "1Gi",
-	    "required": true
 	},
 	{
 	    "name": "SOURCE_REPOSITORY_URL",
 	    "displayName": "Git Repository URL",
 	    "description": "The URL of the repository with your application source code.",
-	    "value": "https://github.com/openshift/nodejs-ex.git"
+	    "value": "https://github.com/ofthecurerh/dancer-ex.git"
 	},
 	{
 	    "name": "SOURCE_REPOSITORY_REF",
@@ -408,7 +371,7 @@
 	{
 	    "name": "APPLICATION_DOMAIN",
 	    "displayName": "Application Hostname",
-	    "description": "The exposed hostname that will route to the Node.js service, if left blank a value will be defaulted.",
+	    "description": "The exposed hostname that will route to the Dancer service, if left blank a value will be defaulted.",
 	    "value": ""
 	},
 	{
@@ -419,30 +382,33 @@
 	    "from": "[a-zA-Z0-9]{40}"
 	},
 	{
-	    "name": "GENERIC_WEBHOOK_SECRET",
-	    "displayName": "Generic Webhook Secret",
-	    "description": "A secret string used to configure the Generic webhook.",
+	    "name": "ADMIN_USERNAME",
+	    "displayName": "Administrator Username",
 	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{40}"
+	    "from": "admin[A-Z0-9]{3}"
+	},
+	{
+	    "name": "ADMIN_PASSWORD",
+	    "displayName": "Administrator Password",
+	    "generate": "expression",
+	    "from": "[a-zA-Z0-9]{8}"
 	},
 	{
 	    "name": "DATABASE_SERVICE_NAME",
 	    "displayName": "Database Service Name",
-	    "value": "mongodb"
+	    "value": "database"
 	},
 	{
 	    "name": "DATABASE_USER",
-	    "displayName": "MongoDB Username",
-	    "description": "Username for MongoDB user that will be used for accessing the database.",
+	    "displayName": "Database Username",
 	    "generate": "expression",
 	    "from": "user[A-Z0-9]{3}"
 	},
 	{
 	    "name": "DATABASE_PASSWORD",
-	    "displayName": "MongoDB Password",
-	    "description": "Password for the MongoDB user.",
+	    "displayName": "Database Password",
 	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{16}"
+	    "from": "[a-zA-Z0-9]{8}"
 	},
 	{
 	    "name": "DATABASE_NAME",
@@ -450,11 +416,17 @@
 	    "value": "sampledb"
 	},
 	{
-	    "name": "DATABASE_ADMIN_PASSWORD",
-	    "displayName": "Database Administrator Password",
-	    "description": "Password for the database admin user.",
+	    "name": "PERL_APACHE2_RELOAD",
+	    "displayName": "Perl Module Reload",
+	    "description": "Set this to \"true\" to enable automatic reloading of modified Perl modules.",
+	    "value": ""
+	},
+	{
+	    "name": "SECRET_KEY_BASE",
+	    "displayName": "Secret Key",
+	    "description": "Your secret key for verifying the integrity of signed cookies.",
 	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{16}"
+	    "from": "[a-z0-9]{127}"
 	}
     ]
 }
