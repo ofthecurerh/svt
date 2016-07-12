@@ -9,7 +9,7 @@ set -o pipefail
 
 # this script is in svt/openshift_scalability/scripts
 CLUSTER_LOADER_DIR=$(dirname ${BASH_SOURCE})/..
-CONTENT_DIR=${CLUSTER_LOADER_DIR}/content
+CONTENT_DIR=${CLUSTER_LOADER_DIR}/content/quickstarts
 
 # names of quickstart app directories in svt/openshift_scalability/content
 QUICKSTART_APPS_DIRS="\
