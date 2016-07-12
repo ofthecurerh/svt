@@ -5,11 +5,11 @@
 ### Included files
 
 For each application there are the following files:
-- <app>-<db>.json
-- <app>-<db>-pv.json
-- <app>-<db>-deploy.json
-- <app>-<db>-deploy-pv.json
-- <app>-build.json
+- \<app>-\<db>.json
+- \<app>-\<db>-pv.json
+- \<app>-\<db>-deploy.json
+- \<app>-\<db>-pv-deploy.json
+- \<app>-build.json
 
 Each application has two permutations, one with persistent volumes and one without persistent volumes. 
 
