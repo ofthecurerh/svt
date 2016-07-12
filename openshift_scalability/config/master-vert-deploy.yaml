@@ -4,49 +4,49 @@ projects:
     tuning: default
     templates:
       - num: 1
-        file: ./content/cakephp/cakephp-mysql-pv-deploy.json
+        file: ./content/quickstarts/cakephp/cakephp-mysql-deploy.json
 
   - num: 1
     basename: dancer-mysql
     tuning: default
     templates:
       - num: 1
-        file: ./content/dancer/dancer-mysql-pv-deploy.json
+        file: ./content/quickstarts/dancer/dancer-mysql-deploy.json
 
   - num: 1
     basename: django-postgresql
     tuning: default
     templates:
       - num: 1
-        file: ./content/django/django-postgresql-pv-deploy.json
+        file: ./content/quickstarts/django/django-postgresql-deploy.json
 
   - num: 1
     basename: nodejs-mongodb
     tuning: default
     templates:
       - num: 1
-        file: ./content/nodejs/nodejs-mongodb-pv-deploy.json
+        file: ./content/quickstarts/nodejs/nodejs-mongodb-deploy.json
 
   - num: 1
     basename: rails-postgresql
     tuning: default
     templates:
       - num: 1
-        file: ./content/rails/rails-postgresql-pv-deploy.json
+        file: ./content/quickstarts/rails/rails-postgresql-deploy.json
 
   - num: 1
     basename: eap64-mysql
     tuning: default
     templates:
       - num: 1
-        file: ./content/eap/eap64-mysql-pv-deploy.json
+        file: ./content/quickstarts/eap/eap64-mysql-deploy.json
 
   - num: 1
     basename: tomcat8-mongodb
     tuning: default
     templates:
       - num: 1
-        file: ./content/tomcat/tomcat8-mongodb-pv-deploy.json
+        file: ./content/quickstarts/tomcat/tomcat8-mongodb-deploy.json
 
 tuningsets:
   - name: default
@@ -56,4 +56,3 @@ tuningsets:
         pause: 0 min
       rate_limit:
         delay: 0 ms
-
