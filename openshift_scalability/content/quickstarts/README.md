@@ -17,7 +17,12 @@ Within each permutation there is a complete template that includes a BuildConfig
 
 ### cluster-loader
 
-In the cluster-loader config directory there are corresponding cluster-loader configs for the above permutations of quickstart templates. 
+In the cluster-loader config directory there are corresponding cluster-loader configs for the above permutations of quickstart templates.
+
+- master-vert.json
+- master-vert-pv.json
+- master-vert-deploy.json
+- master-vert-pv-deploy.json
 
 Example usage:
 ```
@@ -30,13 +35,13 @@ Example usage:
 
 To access routes from an external machine such as a server running JMeter or your workstation, dnsmasq needs to be configured on that system. 
 
-1. Add a dnsmasq configuration file to /etc/dnsmasq.d/ :
+1. Add a dnsmasq configuration file to `/etc/dnsmasq.d/` :
 ```
 # Wildcard DNS for OpenShift Applications - Points to Router
 address=/<routing-config-subdomain>/<router-host-ip-addr>
 ```
 
-2. Update /etc/resolv.conf to point to local dnsmasq instance:
+2. Update `/etc/resolv.conf` to point to local dnsmasq instance:
 ```
 nameserver 127.0.0.1
 <other-nameservers>
